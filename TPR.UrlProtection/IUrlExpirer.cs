@@ -1,7 +1,22 @@
-﻿namespace ProtectedUrlDemo
+﻿namespace TPR.UrlProtection
 {
     public interface IUrlExpirer
     {
+        /// <summary>
+        /// Name of the querystring parameter used to store the hash that prevents the time being modified.
+        /// </summary>
+        string HashParameter { get; set; }
+
+        /// <summary>
+        /// Sets whether to place the hash openly in the querystring or obfuscated in the path
+        /// </summary>
+        ParameterLocation ParameterLocation { get; set; }
+
+        /// <summary>
+        /// When <c>ParameterLocation</c> is set to <c>Path</c>, sets the format of the path to be produced, where {0} is the obfuscated original path and query
+        /// </summary>
+        string? PathTemplate { get; set; }
+
         /// <summary>
         /// Name of the querystring parameter used to store the time the URL was created.
         /// </summary>

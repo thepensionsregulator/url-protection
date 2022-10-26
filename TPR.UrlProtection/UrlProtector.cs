@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace ProtectedUrlDemo
+namespace TPR.UrlProtection
 {
     /// <summary>
     /// Protect URL from being tampered with by including a hash of the original value
@@ -12,6 +12,10 @@ namespace ProtectedUrlDemo
     {
         /// <inheritdoc />
         public string HashParameter { get; set; } = "h";
+        /// <inheritdoc />
+        public ParameterLocation ParameterLocation { get; set; } = ParameterLocation.Query;
+        /// <inheritdoc />
+        public string? PathTemplate { get; set; }
 
         /// <inheritdoc />
         public Uri ProtectPathAndQuery(Uri urlToProtect, string salt)
@@ -24,13 +28,21 @@ namespace ProtectedUrlDemo
             }
 
             // Build up current URL as a string ready to have extra query string parameters added
-            var query = HttpUtility.ParseQueryString(urlToProtect.Query);
+            var query = HttpUtility.ParseQueryString(urlToProtect.Query ?? string.Empty);
 
             // Hash the URI and add it as a parameter
             query.Add(HashParameter, CreateUrlHash(urlToProtect.AbsolutePath + urlToProtect.Query?.TrimStart('?'), salt));
-            return new Uri(urlToProtect.Scheme + "://" + urlToProtect.Authority + urlToProtect.AbsolutePath + "?" + query, UriKind.Absolute);
-        }
+            var urlWithProtection = new Uri(urlToProtect.Scheme + "://" + urlToProtect.Authority + urlToProtect.AbsolutePath + "?" + query, UriKind.Absolute);
 
+            if (ParameterLocation == ParameterLocation.Query)
+            {
+                return urlWithProtection;
+            }
+            else
+            {
+                return PlaceProtectedUrlInPath(urlWithProtection);
+            }
+        }
 
         /// <inheritdoc />
         public bool CheckProtectedPathAndQuery(Uri protectedUrl, string salt)
@@ -40,6 +52,13 @@ namespace ProtectedUrlDemo
             if (string.IsNullOrWhiteSpace(salt))
             {
                 throw new ArgumentException($"'{nameof(salt)}' cannot be null or whitespace.", nameof(salt));
+            }
+
+            if (ParameterLocation == ParameterLocation.Path)
+            {
+                var extractedUrl = ExtractProtectedUrlFromPath(protectedUrl);
+                if (extractedUrl == null) { return false; }
+                protectedUrl = extractedUrl;
             }
 
             // Get the querystring in a usable form
@@ -72,6 +91,31 @@ namespace ProtectedUrlDemo
             return expectedHash == receivedHash;
         }
 
+        /// <inheritdoc />
+        public Uri? ExtractProtectedUrlFromPath(Uri protectedUrl)
+        {
+            if (ParameterLocation == ParameterLocation.Query) { return protectedUrl; }
+
+            if (string.IsNullOrEmpty(PathTemplate)) { throw new InvalidOperationException($"{nameof(PathTemplate)} cannot be null or empty when {nameof(ParameterLocation)} is set to {nameof(ParameterLocation.Path)}"); }
+
+            var match = Regex.Match(protectedUrl.AbsolutePath, string.Format(PathTemplate, "([A-Za-z0-9=/]+)"));
+            if (!match.Success || match.Groups.Count <= 1)
+            {
+                return null;
+            }
+
+            return new Uri(protectedUrl.Scheme + "://" + protectedUrl.Authority + UnobfuscateString(match.Groups[1].Value), UriKind.Absolute);
+        }
+
+        /// <inheritdoc />
+        public Uri PlaceProtectedUrlInPath(Uri urlToProtect)
+        {
+            if (string.IsNullOrEmpty(PathTemplate)) { throw new InvalidOperationException($"{nameof(PathTemplate)} cannot be null or empty when {nameof(ParameterLocation)} is set to {nameof(ParameterLocation.Path)}"); }
+
+            var obfuscatedOriginalPath = ObfuscateString(urlToProtect.AbsolutePath + urlToProtect.Query);
+            return new Uri(urlToProtect.Scheme + "://" + urlToProtect.Authority + string.Format(PathTemplate, obfuscatedOriginalPath), UriKind.Absolute);
+        }
+
         /// <summary>
         /// Creates the hash used to protect a URL.
         /// </summary>
@@ -90,6 +134,16 @@ namespace ProtectedUrlDemo
                 // Base-64 encode the results and strip out any characters that might get URL encoded and cause hash not to match
                 return Regex.Replace(Convert.ToBase64String(hashedBytes), "[^A-Za-z0-9]", string.Empty);
             }
+        }
+
+        private static string ObfuscateString(string obfuscateThis)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(obfuscateThis));
+        }
+
+        private static string UnobfuscateString(string unobfuscateThis)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(unobfuscateThis));
         }
     }
 }

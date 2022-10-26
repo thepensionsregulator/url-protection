@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtectedUrlDemo.Tests", "ProtectedUrlDemo.Tests\ProtectedUrlDemo.Tests.csproj", "{20CF4AB2-ECC4-44F2-8F52-AEED10C68842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TPR.UrlProtection.Tests", "TPR.UrlProtection.Tests\TPR.UrlProtection.Tests.csproj", "{20CF4AB2-ECC4-44F2-8F52-AEED10C68842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtectedUrlDemo", "ProtectedUrlDemo\ProtectedUrlDemo.csproj", "{6F113D18-C326-469D-BBF2-EBB4F7F9429D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TPR.UrlProtection", "TPR.UrlProtection\TPR.UrlProtection.csproj", "{6F113D18-C326-469D-BBF2-EBB4F7F9429D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

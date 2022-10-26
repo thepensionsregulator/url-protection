@@ -1,4 +1,4 @@
-﻿namespace ProtectedUrlDemo.Tests
+﻿namespace TPR.UrlProtection.Tests
 {
     public class UrlExpirerTests
     {

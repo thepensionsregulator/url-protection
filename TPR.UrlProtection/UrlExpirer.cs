@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Web;
 
-namespace ProtectedUrlDemo
+namespace TPR.UrlProtection
 {
     /// <summary>
     /// Expire URLs after a given time or protect query strings from being tampered with 
@@ -11,7 +11,16 @@ namespace ProtectedUrlDemo
         private readonly IUrlProtector _urlProtector;
 
         /// <inheritdoc />
+        public string HashParameter { get => _urlProtector.HashParameter; set => _urlProtector.HashParameter = value; }
+
+        /// <inheritdoc />
         public string TimeParameter { get; set; } = "t";
+
+        /// <inheritdoc />
+        public ParameterLocation ParameterLocation { get => _urlProtector.ParameterLocation; set => _urlProtector.ParameterLocation = value; }
+
+        /// <inheritdoc />
+        public string? PathTemplate { get => _urlProtector.PathTemplate; set => _urlProtector.PathTemplate = value; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlExpirer" /> class.
@@ -61,6 +70,7 @@ namespace ProtectedUrlDemo
             if (!_urlProtector.CheckProtectedPathAndQuery(urlToCheck, salt)) { return true; }
 
             // Get the querystring in a usable form
+            urlToCheck = _urlProtector.ExtractProtectedUrlFromPath(urlToCheck)!;
             var queryString = HttpUtility.ParseQueryString(urlToCheck.Query);
 
             // If time has been removed, expire link

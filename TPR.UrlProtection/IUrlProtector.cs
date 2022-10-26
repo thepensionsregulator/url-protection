@@ -1,11 +1,21 @@
-﻿namespace ProtectedUrlDemo
+﻿namespace TPR.UrlProtection
 {
     public interface IUrlProtector
     {
         /// <summary>
-        /// Name of the querystring parameter used to store the hash that prevents the time being modified.
+        /// Name of the querystring parameter used to store the hash that prevents the url from being modified.
         /// </summary>
         string HashParameter { get; set; }
+
+        /// <summary>
+        /// Sets whether to place the hash openly in the querystring or obfuscated in the path
+        /// </summary>
+        ParameterLocation ParameterLocation { get; set; }
+
+        /// <summary>
+        /// When <c>ParameterLocation</c> is set to <c>Path</c>, sets the format of the path to be produced, where {0} is the obfuscated original path and query
+        /// </summary>
+        string? PathTemplate { get; set; }
 
         /// <summary>
         /// Signs a query string so that you can check that it hasn't been changed.
@@ -22,5 +32,13 @@
         /// <param name="salt">The unique salt used to protect this URL.</param>
         /// <returns>The URL with an added hash parameter</returns>
         Uri ProtectPathAndQuery(Uri urlToProtect, string salt);
+        Uri PlaceProtectedUrlInPath(Uri urlToProtect);
+
+        /// <summary>
+        /// When <c>ParameterLocation</c> is set to <c>Path</c>, extracts the original URL from the obfuscated path
+        /// </summary>
+        /// <param name="protectedUrl"></param>
+        /// <returns></returns>
+        Uri? ExtractProtectedUrlFromPath(Uri protectedUrl);
     }
 }
