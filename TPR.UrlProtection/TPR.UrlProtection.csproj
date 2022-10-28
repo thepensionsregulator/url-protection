@@ -18,6 +18,8 @@
     <PackageLicenseFile>LICENCE.md</PackageLicenseFile>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Company>The Pensions Regulator</Company>
+    <Authors>rickmason-tpr</Authors>
   </PropertyGroup>
 
   <ItemGroup>
