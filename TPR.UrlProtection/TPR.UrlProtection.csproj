@@ -14,9 +14,17 @@
     <RepositoryUrl>https://github.com/thepensionsregulator/url-protection</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageId>ThePensionsRegulator.UrlProtection</PackageId>
+    <PackageTags>url</PackageTags>
+    <PackageLicenseFile>LICENCE.md</PackageLicenseFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\LICENCE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
