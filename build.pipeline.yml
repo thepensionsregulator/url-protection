@@ -71,14 +71,15 @@ steps:
 
   - task: DotNetCoreCLI@2
     inputs:
-      command: publish
-      arguments: -o $(Build.ArtifactStagingDirectory) --configuration Release --verbosity normal
-      projects: $(Build.SourcesDirectory)\url-protection\TPR.UrlProtection\TPR.UrlProtection.csproj
-      publishWebProjects: false
-      zipAfterPublish: false
-    displayName: dotnet publish
+      command: pack
+      outputDir: $(Build.ArtifactStagingDirectory)
+      configurationToPack: Release
+      verbosityPack: normal
+      packagesToPack: $(Build.SourcesDirectory)\url-protection\TPR.UrlProtection\TPR.UrlProtection.csproj
+    displayName: dotnet pack
 
   - template: ./file_system_debug.steps.yml@tpr_pipeline_snippets
 
   - publish: $(Build.ArtifactStagingDirectory)
     displayName: Publish artifact
+    artifact: TPR.UrlProtection
