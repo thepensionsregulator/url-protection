@@ -13,6 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/thepensionsregulator/url-protection</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageId>ThePensionsRegulator.UrlProtection</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
