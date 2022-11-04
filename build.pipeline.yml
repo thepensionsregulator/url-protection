@@ -32,6 +32,8 @@ steps:
   - template: ./file_system_debug.steps.yml@tpr_pipeline_snippets
 
   - template: git-secrets.steps.yml@hooks
+    parameters:
+      repoPath: $(Build.SourcesDirectory)\url-protection
 
   - task: DotNetCoreCLI@2
     inputs:
