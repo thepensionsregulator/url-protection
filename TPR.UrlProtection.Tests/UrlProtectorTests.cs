@@ -18,6 +18,19 @@ namespace TPR.UrlProtection.Tests
             Assert.That(protector.CheckProtectedPathAndQuery(url, salt), Is.True);
         }
 
+        [TestCase(ParameterLocation.Path)]
+        [TestCase(ParameterLocation.Query)]
+        public void UnalteredUrlRequiringUrlEncodingIsAllowed(ParameterLocation parameterLocation)
+        {
+            var url = new Uri("https://www.example.org/protect-me?thing=test with spaces");
+            var salt = Guid.NewGuid().ToString();
+            var protector = CreateProtector(parameterLocation);
+
+            url = protector.ProtectPathAndQuery(url, salt);
+
+            Assert.That(protector.CheckProtectedPathAndQuery(url, salt), Is.True);
+        }
+
         private static UrlProtector CreateProtector(ParameterLocation parameterLocation)
         {
             if (parameterLocation == ParameterLocation.Path)
