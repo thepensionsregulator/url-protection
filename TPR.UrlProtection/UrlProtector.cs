@@ -31,7 +31,7 @@ namespace TPR.UrlProtection
             var query = HttpUtility.ParseQueryString(urlToProtect.Query ?? string.Empty);
 
             // Hash the URI and add it as a parameter
-            query.Add(HashParameter, CreateUrlHash(urlToProtect.AbsolutePath + urlToProtect.Query?.TrimStart('?'), salt));
+            query.Add(HashParameter, CreateUrlHash(urlToProtect.AbsolutePath + query, salt));
             var urlWithProtection = new Uri(urlToProtect.Scheme + "://" + urlToProtect.Authority + urlToProtect.AbsolutePath + "?" + query, UriKind.Absolute);
 
             if (ParameterLocation == ParameterLocation.Query)
@@ -73,7 +73,7 @@ namespace TPR.UrlProtection
             {
                 if (name == HashParameter) { continue; }
                 if (protectedQueryString.Length > 0) { protectedQueryString.Append("&"); }
-                protectedQueryString.Append(name).Append("=").Append(queryString[name]);
+                protectedQueryString.Append(name).Append("=").Append(HttpUtility.UrlEncode(queryString[name]));
             }
 
             // Determine what the hash SHOULD be
