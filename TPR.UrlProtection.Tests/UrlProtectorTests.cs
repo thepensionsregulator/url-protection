@@ -78,6 +78,39 @@ namespace TPR.UrlProtection.Tests
 
         [TestCase(ParameterLocation.Path)]
         [TestCase(ParameterLocation.Query)]
+        public void AlteredHashIsDisallowed(ParameterLocation parameterLocation)
+        {
+            var url = new Uri("https://www.example.org/protect-me?id=1");
+            var salt = Guid.NewGuid().ToString();
+            var protector = CreateProtector(parameterLocation);
+
+            url = protector.ProtectPathAndQuery(url, salt);
+            if (parameterLocation == ParameterLocation.Path) { url = protector.ExtractProtectedUrlFromPath(url); }
+
+            var query = HttpUtility.ParseQueryString(url!.Query);
+            query[protector.HashParameter] = query[protector.HashParameter] + "abc";
+            url = new Uri($"{url.Scheme}://{url.Authority}{url.AbsolutePath}?{query}");
+
+            if (parameterLocation == ParameterLocation.Path) { url = protector.PlaceProtectedUrlInPath(url); }
+
+            Assert.That(protector.CheckProtectedPathAndQuery(url, salt), Is.False);
+        }
+
+        [Test]
+        public void AlteredObfuscatedUrlInPathIsDisallowed()
+        {
+            var url = new Uri("https://www.example.org/protect-me?id=1");
+            var salt = Guid.NewGuid().ToString();
+            var protector = CreateProtector(ParameterLocation.Path);
+
+            url = protector.ProtectPathAndQuery(url, salt);
+            url = new Uri(url!.ToString() + "abc");
+
+            Assert.That(protector.CheckProtectedPathAndQuery(url, salt), Is.False);
+        }
+
+        [TestCase(ParameterLocation.Path)]
+        [TestCase(ParameterLocation.Query)]
         public void ParameterIsPlacedCorrectly(ParameterLocation parameterLocation)
         {
             var url = new Uri("https://www.example.org/protect-me?id=1");
