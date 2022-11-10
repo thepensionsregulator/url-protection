@@ -104,7 +104,14 @@ namespace TPR.UrlProtection
                 return null;
             }
 
-            return new Uri(protectedUrl.Scheme + "://" + protectedUrl.Authority + UnobfuscateString(match.Groups[1].Value), UriKind.Absolute);
+            if (TryUnobfuscateString(match.Groups[1].Value, out var unobfuscated))
+            {
+                return new Uri(protectedUrl.Scheme + "://" + protectedUrl.Authority + unobfuscated, UriKind.Absolute);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <inheritdoc />
@@ -141,9 +148,18 @@ namespace TPR.UrlProtection
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(obfuscateThis));
         }
 
-        private static string UnobfuscateString(string unobfuscateThis)
+        private static bool TryUnobfuscateString(string unobfuscateThis, out string? result)
         {
-            return Encoding.UTF8.GetString(Convert.FromBase64String(unobfuscateThis));
+            try
+            {
+                result = Encoding.UTF8.GetString(Convert.FromBase64String(unobfuscateThis));
+                return true;
+            }
+            catch (FormatException)
+            {
+                result = null;
+                return false;
+            }
         }
     }
 }
